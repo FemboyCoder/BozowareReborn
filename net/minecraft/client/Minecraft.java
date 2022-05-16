@@ -1,10 +1,10 @@
 package net.minecraft.client;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
+import bozoware.client.Bozoware;
+import bozoware.client.display.GuiLogin;
+import bozoware.client.event.input.EventKey;
+import bozoware.launcher.LaunchClient;
+import com.google.common.collect.*;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListenableFutureTask;
@@ -13,65 +13,23 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.Proxy;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import javax.imageio.ImageIO;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.audio.MusicTicker;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiControls;
-import net.minecraft.client.gui.GuiGameOver;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.GuiIngameMenu;
-import net.minecraft.client.gui.GuiMainMenu;
-import net.minecraft.client.gui.GuiMemoryErrorScreen;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiSleepMP;
-import net.minecraft.client.gui.GuiYesNo;
-import net.minecraft.client.gui.GuiYesNoCallback;
-import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.achievement.GuiAchievement;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.gui.stream.GuiStreamUnavailable;
 import net.minecraft.client.main.GameConfiguration;
-import net.minecraft.client.multiplayer.GuiConnecting;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerLoginClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.particle.EffectRenderer;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderGlobal;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.chunk.RenderChunk;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -79,29 +37,8 @@ import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.DefaultResourcePack;
-import net.minecraft.client.resources.FoliageColorReloadListener;
-import net.minecraft.client.resources.GrassColorReloadListener;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourcePack;
-import net.minecraft.client.resources.LanguageManager;
-import net.minecraft.client.resources.ResourceIndex;
-import net.minecraft.client.resources.ResourcePackRepository;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
-import net.minecraft.client.resources.SkinManager;
-import net.minecraft.client.resources.data.AnimationMetadataSection;
-import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
-import net.minecraft.client.resources.data.FontMetadataSection;
-import net.minecraft.client.resources.data.FontMetadataSectionSerializer;
-import net.minecraft.client.resources.data.IMetadataSerializer;
-import net.minecraft.client.resources.data.LanguageMetadataSection;
-import net.minecraft.client.resources.data.LanguageMetadataSectionSerializer;
-import net.minecraft.client.resources.data.PackMetadataSection;
-import net.minecraft.client.resources.data.PackMetadataSectionSerializer;
-import net.minecraft.client.resources.data.TextureMetadataSection;
-import net.minecraft.client.resources.data.TextureMetadataSectionSerializer;
+import net.minecraft.client.resources.*;
+import net.minecraft.client.resources.data.*;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
@@ -115,11 +52,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLeashKnot;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.boss.BossStatus;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.item.EntityBoat;
-import net.minecraft.entity.item.EntityItemFrame;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Bootstrap;
@@ -144,21 +77,9 @@ import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.IStatStringFormat;
 import net.minecraft.stats.StatFileWriter;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.FrameTimer;
-import net.minecraft.util.IThreadListener;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MinecraftError;
-import net.minecraft.util.MouseHelper;
-import net.minecraft.util.MovementInputFromOptions;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ScreenShotHelper;
-import net.minecraft.util.Session;
 import net.minecraft.util.Timer;
 import net.minecraft.util.Util;
+import net.minecraft.util.*;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.WorldProviderHell;
@@ -171,19 +92,31 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.ContextCapabilities;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.opengl.OpenGLException;
-import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.opengl.*;
 import org.lwjgl.util.glu.GLU;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Proxy;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
 {
@@ -229,7 +162,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     private Entity renderViewEntity;
     public Entity pointedEntity;
     public EffectRenderer effectRenderer;
-    private final Session session;
+    public Session session;
     private boolean isGamePaused;
 
     /** The font renderer used for displaying and measuring text */
@@ -312,7 +245,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     private IReloadableResourceManager mcResourceManager;
     private final IMetadataSerializer metadataSerializer_ = new IMetadataSerializer();
     private final List<IResourcePack> defaultResourcePacks = Lists.<IResourcePack>newArrayList();
-    private final DefaultResourcePack mcDefaultResourcePack;
+    public final DefaultResourcePack mcDefaultResourcePack;
     private ResourcePackRepository mcResourcePackRepository;
     private LanguageManager mcLanguageManager;
     private IStream stream;
@@ -558,8 +491,14 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         GlStateManager.viewport(0, 0, this.displayWidth, this.displayHeight);
         this.effectRenderer = new EffectRenderer(this.theWorld, this.renderEngine);
         this.checkGLError("Post startup");
+
+        Bozoware.INSTANCE.startup();
+
         this.ingameGUI = new GuiIngame(this);
 
+        this.displayGuiScreen(new GuiLogin());
+
+        /*
         if (this.serverName != null)
         {
             this.displayGuiScreen(new GuiConnecting(new GuiMainMenu(), this, this.serverName, this.serverPort));
@@ -568,6 +507,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             this.displayGuiScreen(new GuiMainMenu());
         }
+
+         */
 
         this.renderEngine.deleteTexture(this.mojangLogo);
         this.mojangLogo = null;
@@ -616,7 +557,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     private void createDisplay() throws LWJGLException
     {
         Display.setResizable(true);
-        Display.setTitle("Minecraft 1.8.8");
+        Display.setTitle(Bozoware.INSTANCE.CLIENT_NAME+" "+Bozoware.INSTANCE.CLIENT_VERSION);
 
         try
         {
@@ -661,6 +602,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
     private void setWindowIcon()
     {
+
         Util.EnumOS util$enumos = Util.getOSType();
 
         if (util$enumos != Util.EnumOS.OSX)
@@ -670,8 +612,15 @@ public class Minecraft implements IThreadListener, IPlayerUsage
 
             try
             {
+
                 inputstream = this.mcDefaultResourcePack.getInputStreamAssets(new ResourceLocation("icons/icon_16x16.png"));
                 inputstream1 = this.mcDefaultResourcePack.getInputStreamAssets(new ResourceLocation("icons/icon_32x32.png"));
+
+                if(inputstream == null) {
+                    throw new IllegalStateException("Inputstream is null");
+                } else if(inputstream1 == null) {
+                    throw new IllegalStateException("Inputstream1 is null");
+                }
 
                 if (inputstream != null && inputstream1 != null)
                 {
@@ -905,7 +854,10 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             inputstream = this.mcDefaultResourcePack.getInputStream(locationMojangPng);
             this.mojangLogo = textureManagerInstance.getDynamicTextureLocation("logo", new DynamicTexture(ImageIO.read(inputstream)));
-            textureManagerInstance.bindTexture(this.mojangLogo);
+
+            inputstream = LaunchClient.class.getResourceAsStream("/assets/minecraft/textures/gui/title/background.png");
+            ResourceLocation test = textureManagerInstance.getDynamicTextureLocation("bozoware/background/background.png", new DynamicTexture(ImageIO.read(inputstream)));
+            textureManagerInstance.bindTexture(test);
         }
         catch (IOException ioexception)
         {
@@ -915,6 +867,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             IOUtils.closeQuietly(inputstream);
         }
+
+        ByteBuffer buffer = BufferUtils.createByteBuffer(3840 * 2160 * 3);
+        BufferedImage image = new BufferedImage(3840, 2160, BufferedImage.TYPE_INT_ARGB);
+
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
@@ -927,7 +885,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         int j = 256;
         int k = 256;
-        this.func_181536_a((scaledresolution.getScaledWidth() - j) / 2, (scaledresolution.getScaledHeight() - k) / 2, 0, 0, j, k, 255, 255, 255, 255);
+        this.drawMojangLogo((scaledresolution.getScaledWidth() - j) / 2, (scaledresolution.getScaledHeight() - k) / 2, 0, 0, j, k, 255, 255, 255, 255);
         GlStateManager.disableLighting();
         GlStateManager.disableFog();
         framebuffer.unbindFramebuffer();
@@ -937,7 +895,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.updateDisplay();
     }
 
-    public void func_181536_a(int p_181536_1_, int p_181536_2_, int p_181536_3_, int p_181536_4_, int p_181536_5_, int p_181536_6_, int p_181536_7_, int p_181536_8_, int p_181536_9_, int p_181536_10_)
+    public void drawMojangLogo(int p_181536_1_, int p_181536_2_, int p_181536_3_, int p_181536_4_, int p_181536_5_, int p_181536_6_, int p_181536_7_, int p_181536_8_, int p_181536_9_, int p_181536_10_)
     {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
@@ -1918,6 +1876,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     }
                     else
                     {
+
+                        Bozoware.INSTANCE.getEventBus().call(new EventKey(k));
+
                         if (k == 1)
                         {
                             this.displayInGameMenu();
@@ -2912,7 +2873,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     {
         for (int i = 16384; i > 0; i >>= 1)
         {
-            GL11.glTexImage2D(GL11.GL_PROXY_TEXTURE_2D, 0, GL11.GL_RGBA, i, i, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, (ByteBuffer)((ByteBuffer)null));
+            GL11.glTexImage2D(GL11.GL_PROXY_TEXTURE_2D, 0, GL11.GL_RGBA, i, i, 0, GL11.GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer)((ByteBuffer)null));
             int j = GL11.glGetTexLevelParameteri(GL11.GL_PROXY_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
 
             if (j != 0)

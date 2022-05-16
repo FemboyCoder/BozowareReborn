@@ -109,6 +109,11 @@ public class NetworkPlayerInfo
         return this.locationCape;
     }
 
+    public void setLocationCape(ResourceLocation location)
+    {
+        this.locationCape = location;
+    }
+
     public ScorePlayerTeam getPlayerTeam()
     {
         return Minecraft.getMinecraft().theWorld.getScoreboard().getPlayersTeam(this.getGameProfile().getName());

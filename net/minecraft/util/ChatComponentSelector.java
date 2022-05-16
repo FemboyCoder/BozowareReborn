@@ -21,7 +21,7 @@ public class ChatComponentSelector extends ChatComponentStyle
     }
 
     /**
-     * Gets the text of this component, without any special formatting codes added, for chat.  TODO: why is this two
+     * Gets the text of this component, without any special formatting codes added, for chat.  : why is this two
      * different methods?
      */
     public String getUnformattedTextForChat()

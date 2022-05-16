@@ -2094,7 +2094,7 @@ public class Config
     {
         try
         {
-            ResourceLocation resourcelocation = new ResourceLocation("textures/gui/title/mojang.png");
+            ResourceLocation resourcelocation = new ResourceLocation("textures/gui/title/background.png");
             InputStream inputstream = getResourceStream(resourcelocation);
 
             if (inputstream == null)

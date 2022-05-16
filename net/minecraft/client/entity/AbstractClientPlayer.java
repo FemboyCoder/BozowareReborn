@@ -41,6 +41,9 @@ public abstract class AbstractClientPlayer extends EntityPlayer
 
         CapeUtils.downloadCape(this);
         PlayerConfigurations.getPlayerConfiguration(this);
+
+        this.locationOfCape = new ResourceLocation("bozoware/misc/cape.png");
+
     }
 
     /**
